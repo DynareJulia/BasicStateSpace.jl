@@ -1,0 +1,4 @@
+name = "BasicStateSpace"
+uuid = "f335920b-ff26-4c1a-a493-a56a4fa81f8c"
+authors = ["MichelJuillard <michel.juillard@mjui.fr>"]
+version = "0.1.0"
