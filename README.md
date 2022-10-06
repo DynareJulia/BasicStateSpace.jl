@@ -13,7 +13,7 @@ $$ s_t = c + A s_{t-1} + B u_t $$
 
 - Measurement equation:
 
-$$ y_t = d + D s_{t} + e_{t} $$
+$$ y_t = d + C s_{t} + e_{t} $$
 
 with $E(u) = E(e) = 0$.
 
