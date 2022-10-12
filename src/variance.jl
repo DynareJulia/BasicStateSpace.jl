@@ -1,3 +1,5 @@
+using LinearRationalExpectations
+
 struct NonstationaryVarianceWs
     rΣ_s_s::Matrix{Float64}
     rA1::Matrix{Float64}
@@ -520,3 +522,53 @@ function variance_decomposition(LREresults::LinearRationalExpectationsResults,
     return VD
 end
                                  
+
+mutable struct ConditionalVarianceWS{T}
+    Ss::AbstractMatrix{T}
+    BSu::AbstractMatrix{T}
+    k::AbstractMatrix{T}
+    Sy::AbstractMatrix{T}
+    ConditionalVarianceWS(Ns::Integer, T::DataType=Float64) = ConditionalVarianceWS(Ns, Ns, Ns, T)
+    function ConditionalVarianceWS(Ns::Integer, Nu::Integer, Ny::Integer, T::DataType=Float64)
+        Ss = zeros(T, Ns, Ns)
+        BSu = zeros(T, Ns, Nu)
+        k = zeros(T, Ns, Ns)
+        Sy = zeros(T, Ny, Ny)
+        new{T}(Ss, BSu, k, Sy)
+    end
+
+end
+
+function init_workspace!(ws::ConditionalVarianceWS{T},
+                         model::StateSpaceModel{T}) where T<:Real
+
+   mul!(ws.BSu, model.B, model.Q, T(1), T(0))
+   mul!(ws.k, ws.BSu, model.B', T(1), T(0))
+
+end
+
+function conditional_variance(model::StateSpaceModel{T},
+                              ws::ConditionalVarianceWS{T},
+                              n::Integer) where T<:Real
+
+    Ns = size(model.A)[1]
+    Nu = size(model.Q)[1]
+    Ny = length(model.d)
+    @assert size(model.B) == (Ns, Nu)
+    init_workspace!(ws, model)
+
+    state_c_vars = repeat(ws.k, outer=[1, 1, n])
+    meas_c_vars = repeat(model.H, outer=[1, 1, n])
+
+    for i in 2:size(state_c_vars)[3]
+        @views begin
+        mul!(ws.Ss, model.A, state_c_vars[:, :, i-1], T(1), T(0))
+        mul!(state_c_vars[:, :, i], ws.Ss, model.A', T(1), T(1))
+
+        mul!(ws.Sy, model.C, meas_c_vars[:, :, i-1], T(1), T(0)) 
+        mul!(meas_c_vars[:, :, i], ws.Sy, model.C', T(1), T(0))
+        end
+    end
+    (state_c_vars, meas_c_vars)
+
+end
