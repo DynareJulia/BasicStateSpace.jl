@@ -17,13 +17,14 @@ function plot_mean_forecast(s::Vector{Vector{T}},
                             label::Matrix{String}) where T<:Real
     @assert length(s[1]) == size(label)[2]
     data = reduce(hcat,s)'
-    f = plot(data, label=label)
-    for (i, col) in enumerate(eachcol(data))
-        vars = [diag(c_vars[:,:,j])[i] for j in 1:length(s[1])]
-        plot!(f, col, ribbon=0.254*vars, label=false) # 20%
-        plot!(f, col, ribbon=0.525*vars, label=false) # 40%
-        plot!(f, col, ribbon=0.842*vars, label=false) # 60%
-        plot!(f, col, ribbon=1.28*vars, label=false) # 80%
+    vars = reduce(hcat, [diag(c_vars[:, :, i]) for i in 1:length(s)])'
+    f = plot()
+    for (i, l) in enumerate(label)
+        plot!(f, data[:, i], label=l)
+        plot!(f, data[:, i], ribbon=0.254*vars[:, i], label=false) # 20%
+        plot!(f, data[:, i], ribbon=0.525*vars[:, i], label=false) # 40%
+        plot!(f, data[:, i], ribbon=0.842*vars[:, i], label=false) # 60%
+        plot!(f, data[:, i], ribbon=1.28*vars[:, i], label=false) # 80%
     end
     display(f)
 end
