@@ -14,17 +14,22 @@ end
 
 function plot_mean_forecast(s::Vector{Vector{T}},
                             c_vars::Array{T, 3},
-                            label::Vector{String}) where T<:Real
+                            label::Vector{String},
+                            linewidth::Float64=0.1) where T<:Real
     @assert length(s[1]) == length(label)
     data = reduce(hcat,s)'
     vars = reduce(hcat, [diag(c_vars[:, :, i]) for i in 1:length(s)])'
     f = plot()
+    colors = distinguishable_colors(length(label))
     for (i, l) in enumerate(label)
-        plot!(f, data[:, i], label=l)
-        plot!(f, data[:, i], ribbon=0.254*vars[:, i], label=false) # 20%
-        plot!(f, data[:, i], ribbon=0.525*vars[:, i], label=false) # 40%
-        plot!(f, data[:, i], ribbon=0.842*vars[:, i], label=false) # 60%
-        plot!(f, data[:, i], ribbon=1.28*vars[:, i], label=false) # 80%
+        ##0.254 - 20%, 0.525 - 40%, 0.842 - 60%, 1.28 - 80%##
+        plot!(f, data[:, i], label=l, c=colors[i], ribbon=1.28*vars[:, i], fillcolor=colors[i])
+        plot!(f, data[:, i] + 0.254*vars[:, i], c=:black, label=false, linewidth=linewidth)
+        plot!(f, data[:, i] - 0.254*vars[:, i], c=:black, label=false, linewidth=linewidth)
+        plot!(f, data[:, i] + 0.525*vars[:, i], c=:black, label=false, linewidth=linewidth)
+        plot!(f, data[:, i] - 0.525*vars[:, i], c=:black, label=false, linewidth=linewidth)
+        plot!(f, data[:, i] + 0.842*vars[:, i], c=:black, label=false, linewidth=linewidth)
+        plot!(f, data[:, i] - 0.842*vars[:, i], c=:black, label=false, linewidth=linewidth)
     end
     display(f)
 end

@@ -1,6 +1,6 @@
 module BasicStateSpace
 
-using LinearAlgebra, MKL, Plots
+using LinearAlgebra, MKL, Plots, Colors
 
 include("state_space_model.jl")
 include("variance.jl")
