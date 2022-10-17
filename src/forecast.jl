@@ -14,8 +14,8 @@ end
 
 function plot_mean_forecast(s::Vector{Vector{T}},
                             c_vars::Array{T, 3},
-                            label::Matrix{String}) where T<:Real
-    @assert length(s[1]) == size(label)[2]
+                            label::Vector{String}) where T<:Real
+    @assert length(s[1]) == length(label)
     data = reduce(hcat,s)'
     vars = reduce(hcat, [diag(c_vars[:, :, i]) for i in 1:length(s)])'
     f = plot()

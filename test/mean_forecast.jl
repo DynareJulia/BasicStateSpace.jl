@@ -26,4 +26,4 @@ states, measurements = mean_forecast(model, [0.9, 0.5, 0.1], 10)
 ws = ConditionalVarianceWS(3)
 states_c_vars, meas_c_vars = conditional_variance(model, ws, 10)
 
-plot_mean_forecast(states, states_c_vars, ["x" "y" "z"])
+plot_mean_forecast(states, states_c_vars, ["x", "y", "z"])
