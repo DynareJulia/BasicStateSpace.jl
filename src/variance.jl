@@ -547,6 +547,11 @@ function init_workspace!(ws::ConditionalVarianceWS{T},
 
 end
 
+Base.@kwdef struct ConditionalVariance{T<:Real}
+    states_variance::Array{T, 3}
+    measurements_variance::Array{T, 3}
+end
+
 function conditional_variance(model::StateSpaceModel{T},
                               ws::ConditionalVarianceWS{T},
                               n::Integer) where T<:Real
@@ -569,6 +574,6 @@ function conditional_variance(model::StateSpaceModel{T},
         mul!(meas_c_vars[:, :, i], ws.Sy, model.C', T(1), T(0))
         end
     end
-    (state_c_vars, meas_c_vars)
+    ConditionalVariance(state_c_vars, meas_c_vars)
 
 end
